@@ -1,4 +1,4 @@
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     @csrf
     @if($method == 'edit')
     <div class="form-group">
@@ -10,6 +10,25 @@
     <div class="form-group">
         <label>Nama</label>
         <input type="text" class="form-control" name="nama" required  value="{{$item->nama ?? ''}}">
+    </div>
+
+    <div class="form-group">
+        <label for="">Foto</label>
+        <input type="file" class="form-control" name="foto">
+        @if(!empty($item->foto))
+            <img src="{{ asset($item->foto) }}" alt="Foto Item" width="100" class="mt-2">
+        @endif
+    </div>
+
+    <div class="form-group">
+        <label>Kategori</label>
+        <select class="form-control select2" name="categories[]" multiple>
+            @foreach($categories as $cat)
+                <option value="{{ $cat->id }}" {{ isset($item) && $item->categories->contains($cat->id) ? 'selected' : '' }}>
+                    {{ $cat->nama }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     <div class="form-group">
@@ -25,13 +44,13 @@
     @php $selected = $item->supplier ?? ''; @endphp
     <div class="form-group">
         <label>Supplier</label>
-        <select class="form-control" required name="supplier">
-            <option @if($selected == '') selected @endif value="">--Pilih--</option>
-            <option @if($selected == 'Tokopaedi') selected @endif>Tokopaedi</option>
-            <option @if($selected == 'Bukulapuk') selected @endif>Bukulapuk</option>
-            <option @if($selected == 'TokoBagas') selected @endif>TokoBagas</option>
-            <option @if($selected == 'E Commurz') selected @endif>E Commurz</option>
-            <optio @if($selected == 'Blublu') selected @endif>Blublu</option>
+        <select class="form-control" name="supplier">
+            <option value="">--Pilih--</option>
+            <option value="Tokopaedi" @if($selected == 'Tokopaedi') selected @endif>Tokopaedi</option>
+            <option value="Bukulapuk" @if($selected == 'Bukulapuk') selected @endif>Bukulapuk</option>
+            <option value="TokoBagas" @if($selected == 'TokoBagas') selected @endif>TokoBagas</option>
+            <option value="E Commurz" @if($selected == 'E Commurz') selected @endif>E Commurz</option>
+            <option value="Blublu" @if($selected == 'Blublu') selected @endif>Blublu</option>
         </select>
     </div>
 
@@ -43,8 +62,8 @@
             <option @if($selected == 'Obat') selected @endif>Obat</option>
             <option @if($selected == 'Alkes') selected @endif>Alkes</option>
             <option @if($selected == 'Matkes') selected @endif>Matkes</option>
-            <optio @if($selected == 'Umum') selected @endif>Umum</option>
-            <optio @if($selected == 'ATK') selected @endif>ATK</option>
+            <option @if($selected == 'Umum') selected @endif>Umum</option>
+            <option @if($selected == 'ATK') selected @endif>ATK</option>
         </select>
     </div>
 

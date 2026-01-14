@@ -24,4 +24,12 @@
 </div>
 @endsection
 @section('js')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "--Pilih Kategori--",
+            allowClear: true
+        });
+    });
+</script>
 @endsection

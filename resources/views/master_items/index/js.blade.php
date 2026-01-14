@@ -8,6 +8,22 @@
     var data_per_fetch = 500;
     var data_fetched = 0;
 
+    function formatRupiah(angka, prefix) {
+        var number_string = angka.toString().replace(/[^,\d]/g, ""),
+            split = number_string.split(","),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? "." : "";
+            rupiah += separator + ribuan.join(".");
+        }
+
+        rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+        return prefix == undefined ? rupiah : rupiah ? "Rp " + rupiah : "";
+    }
+
     $(document).ready(function() {
         $('#table').DataTable({
             searching: false,
@@ -20,12 +36,22 @@
         getData()
     })
 
+    $('.btn-reset-filter').click(function() {
+        $('#filter-kode').val('')
+        $('#filter-nama').val('')
+        $('#filter-category').val('')
+        $('#filter-harga-min').val('')
+        $('#filter-harga-max').val('')
+        getData()
+    })
+
     function getData(){
         
         $('#loading-filter').show();
         var dataTableObj = $('#table').DataTable();
         var filter_kode = $('#filter-kode').val()
         var filter_nama = $('#filter-nama').val()
+        var filter_category = $('#filter-category').val()
         var filter_harga_min = $('#filter-harga-min').val()
         var filter_harga_max = $('#filter-harga-max').val()
         dataTableObj.clear().draw();
@@ -35,26 +61,39 @@
             dataType: 'json',
             tryCount: 0,
             retryLimit: 3,
-            data: 'kode=' + filter_kode + '&nama=' + filter_nama + '&hargamin=' + filter_harga_min + '&hargamax=' + filter_harga_max,
+            data: {
+                kode: filter_kode,
+                nama: filter_nama,
+                category_id: filter_category,
+                hargamin: filter_harga_min,
+                hargamax: filter_harga_max
+            },
             success: function(results) {
                 var data = results.data
 
                 $.each(data, function(index, item) {
-                    array_temp = [];
-                    var harga_jual = item.harga_beli + item.harga_beli * item.laba / 100;
-                    harga_jual = Math.round(harga_jual)
+                    var array_temp = [];
+                    var harga_jual = item.harga_beli + (item.harga_beli * item.laba / 100);
+                    harga_jual = Math.round(harga_jual);
                     var kode = item.kode;
 
-                    var html = `<a href="{{url('master-items/view/')}}/` + kode + `" class="btn btn-primary">View</a>`
+                    var btnView = `<a href="{{url('master-items/view/')}}/` + kode + `" class="btn btn-primary">View</a>`;
+                    
+                    // Foto
+                    var img = '-';
+                    if(item.foto) {
+                        img = `<img src="{{asset('')}}${item.foto}" style="max-width: 50px; max-height: 50px;">`;
+                    }
 
-                    $.each(item, function(obj_name, obj_value) {
-                        if (obj_name == 'laba') return false;
-                        array_temp.push(obj_value)
-                    })
-                    array_temp.push(harga_jual)
-                    array_temp.push(item.supplier)
-                    array_temp.push(html)
-
+                    // Explicit mapping
+                    array_temp.push(item.kode);
+                    array_temp.push(img);
+                    array_temp.push(item.nama);
+                    array_temp.push(item.jenis);
+                    array_temp.push(formatRupiah(item.harga_beli, 'Rp '));
+                    array_temp.push(formatRupiah(harga_jual, 'Rp '));
+                    array_temp.push(item.supplier ?? '-');
+                    array_temp.push(btnView);
 
                     dataTableObj.row.add(array_temp).draw(true);
                 });

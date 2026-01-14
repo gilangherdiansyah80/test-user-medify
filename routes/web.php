@@ -31,3 +31,13 @@ Route::get('/master-items/delete/{id}', [App\Http\Controllers\MasterItemsControl
 
 
 Route::get('/master-items/update-random-data', [App\Http\Controllers\MasterItemsController::class, 'updateRandomData']);
+Route::get('/master-items/export-excel', [App\Http\Controllers\MasterItemsController::class, 'downloadExcel']);
+
+// Category Routes
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::get('/categories/search', [App\Http\Controllers\CategoryController::class, 'search']);
+Route::get('/categories/form/{method}/{id?}', [App\Http\Controllers\CategoryController::class, 'formView']);
+Route::post('/categories/form/submit/{method}/{id?}', [App\Http\Controllers\CategoryController::class, 'formSubmit']);
+Route::get('/categories/view/{id}', [App\Http\Controllers\CategoryController::class, 'singleView']);
+Route::get('/categories/delete/{id}', [App\Http\Controllers\CategoryController::class, 'delete']);
+Route::get('/categories/download-pdf/{id}', [App\Http\Controllers\CategoryController::class, 'downloadPdf']);
